@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true,
+		"liveServer.settings.multiRootWorkspaceName": "rmafrozen"
+	},
+	"extensions": {
+		"recommendations": [
+			"github.copilot-nightly"
+		]
+	}
+}

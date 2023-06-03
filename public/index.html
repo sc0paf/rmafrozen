@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMA Frozen Ordering</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+
+
+<div id="app" class="main__cont">
+    <div class="topwrap"><h1>RMA Frozen Sheet</h1></div>
+
+        <!-- Admin Panel -->
+    <div class="header" v-if="admin == true">
+        <h3>Add items</h3>
+        <form>
+        Item: <input type="text" v-model="newItem">
+        Minimum: <input type="number" v-model="newMinimum">
+        Maximum: <input type="number" v-model="newMaximum">
+        Category: <input type="text" v-model="newCategory">
+        Avail:<input type="checkbox" v-model="newAvail">
+          <button @click.prevent="addNewItem()">Add</button>
+        </form>
+    </div>
+    <!-- end admin  / start pull -->
+    <div class="topwrap" v-if="pickLine">
+        
+    </div>
+
+
+    <!-- end Pull -->
+
+    <ul class="topwrap">
+    <form>
+        <li class="frow"><label for="route">Route: </label>
+            <select name="route" id="route" v-model="rtName">
+                <option value="r1">Route 1</option>
+                <option value="r2">Route 2</option>
+                <option value="r3">Route 3</option>
+                <option value="r4">Route 4</option>
+                <option value="r5">Route 5</option>
+                <option value="r6">Route 6</option>
+                <option value="r7">Route 7</option>
+                <option value="r8">Route 8</option>
+                <option value="r9">Route 9</option>
+                <option value="r10">Route 10</option>
+                <option value="r11">Route 11</option>
+                <option value="r12">Route 12</option>
+            </select>
+        </li>
+
+        <li class="frow">
+            <label for="account">Account: </label>
+            <input type="text" v-model="accountName">
+        </li>
+        
+        <input type="radio" id="Vending" value="Vending" v-model="vendOrMart" style="float:left; margin-left: 25%;" />
+        <label for="Vending" style="float: left; ">Frozen</label>
+        <input type="radio" id="Market" value="Market" v-model="vendOrMart" />
+        <label for="Market">Coffee Products</label>
+    </ul>
+
+        <div>
+            <button class="uiToggle" @click="asToggle" :class="[isToggled ? 'active' : '']">ADD</button>
+            
+            <button class="uiToggle" @click="asToggle" :class="[!isToggled ? 'active' : '']">REMOVE</button>
+        </div>
+
+        <div v-if="vendOrMart == 'Vending'" class="topwrap">
+           <h2>Frozen</h2>
+            <span v-if="dataReady">
+                <template v-for="(item, index) in items">
+                    <div class="frow" v-if="item[1]">
+                        <button @click="isToggled ? incItem(item, 1) : decItem(item, 1)">{{item[0]}} - {{index}}</button>
+                        <button @click="isToggled ? incItem(item, 6) : decItem(item, 6)" style="width: 10%;">6</button>
+                        <button @click="isToggled ? incItem(item, 10) : decItem(item, 10)" style="width: 10%;">10</button>
+                        <input type="number" :min="item[2]" :max="item[3]" :id="index" v-model="item[5]">
+                    </div>
+                </template>
+            </span>
+        </div>
+        <div v-if="vendOrMart == 'Market'" class="topwrap">
+            <h1>Coffee Products</h1>
+        </div>
+        <textarea placeholder="Write-ins or comments"></textarea>
+        <button style="width:100%; height: 3rem; box-shadow: 5px 5px 5px black; font-size: 24px;" @click="postOrder()"><b>SUBMIT</b></button>
+    </form>
+
+
+<footer id="footer">
+    <button @click="admin = !admin">Add Items</button>
+    <button>order</button>
+    <button @click="pickLine = !pickLine">pull</button>
+</footer>
+</div>
+
+
+    </div>
+    <script src="src/firebase.js" type="module"></script> 
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</body>
+</html>

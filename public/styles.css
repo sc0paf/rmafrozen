@@ -1,0 +1,101 @@
+body {
+    background-color: #333;
+}
+
+#footer {
+    width: 100%;
+    margin: 1em auto;
+    padding-top: .5em;
+    background-color: whitesmoke;
+    height: 2rem;
+    border-radius: 5px;
+    box-shadow: 5px 5px 5px black;
+}
+
+h1 {
+    margin-top: none;
+}
+
+textarea {
+    margin-top: .5em;
+    width: 90%;
+    height: 30%;
+}
+
+.uiToggle {
+    font-size: 24px;
+    margin: 0 1em 1em 1em;
+    box-shadow: 5px 5px 5px black;
+}
+
+.active {
+    background-color: green;
+}
+
+.header{
+    background-color: whitesmoke;
+    padding: 0;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    border-radius: 3px;
+    box-shadow: 5px 5px 5px black;
+}
+
+.topwrap {
+    background-color: whitesmoke;
+    list-style-type: none;
+    padding: 0;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    border-radius: 3px;
+    box-shadow: 5px 5px 5px black;
+}
+
+.irow {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0;
+}
+
+.irow > label {
+    padding: 0;
+}
+
+.irow > input {
+    flex: 1;
+}
+
+.irow > input,
+.irow > button {
+    padding: .5em;
+}
+
+
+.frow {
+    display: flex;
+    justify-content: flex-end;
+    padding: .5em;
+}
+
+.frow > label {
+    padding: .5em 1em .5em 0;
+}
+
+.frow > input {
+    flex: 1;
+}
+
+.frow > input,
+.frow > button {
+    padding: .5em;
+}
+
+.frow > button {
+    width: 70%;
+}
+
+.main__cont {
+    width: 90vw;
+    margin: auto;
+    text-align: center;
+}
