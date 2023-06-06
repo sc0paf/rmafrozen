@@ -5,7 +5,15 @@
   const { createApp } = Vue;
 
     const firebaseConfig = {
-      //firebase config
+      apiKey: "AIzaSyCcw5jd8XSjcz1SXTWdUnEeUat8kNUePeM",
+      authDomain: "rmafr-22482.firebaseapp.com",
+      databaseURL: "https://rmafr-22482-default-rtdb.firebaseio.com",
+      projectId: "rmafr-22482",
+      storageBucket: "rmafr-22482.appspot.com",
+      messagingSenderId: "575367101291",
+      appId: "1:575367101291:web:6cbee6e5e6dc52773f6a2e",
+      measurementId: "G-HF0KQF0L8R",
+      databaseURL: "https://rmafr-22482-default-rtdb.firebaseio.com"
     };
 
     // init firebase db
@@ -21,16 +29,23 @@
           title: 'RMA FROZEN SHEET',
           isToggled: true,
           admin: false,
+          driver: true,
           showitup: false,
+          today: new Date().toJSON().slice(0, 10),
           newItem: '',
-          newAvail: '',
+          newAvail: true,
           newMinimum: 0,
           newMaximum: 0,
+          newDate: '',
+          havePick: false,
           newCategory: '',
           rtName: 'Route 1',
           accountName: '',
+          toPick: {},
           pickLine: false,
+          pickDate: new Date().toJSON().slice(0, 10),
           order: {},
+          fullItems: {},
           items: []
         }
       },
@@ -45,7 +60,8 @@
           const itemsRef = ref(database, 'items')
           const snapshot = await get(itemsRef)
           
-          this.items = Object.values(snapshot.val())
+          //this.items = Object.values(snapshot.val())
+          this.items = snapshot.val()
           this.dataReady = true
 
           } catch (error) {
@@ -53,19 +69,18 @@
           }
         },
         addNewItem() {
-
           const db = getDatabase();
           set(ref(db, 'items/' + this.newNumber), {
-            0: this.newItem,
-            1: this.newAvail,
-            2: this.newMinimum,
-            3: this.newMaximum,
-            4: this.newCategory,
-            5: 0
+            'name': this.newItem,
+            'avail': this.newAvail,
+            'min': this.newMinimum,
+            'max': this.newMaximum,
+            'category': this.newCategory,
+            'placeholder': 0
           }).then(() => {
             alert('saved!')
             this.newItem = ''
-            this.newAvail = ''
+            this.newAvail = false
             this.newMinimum = 0
             this.newMaximum = 0
             this.newCategory = ''
@@ -73,28 +88,61 @@
           }).catch(() => {
             console.log('failed!')
           })
+        },
+        async getOrders() {
+          const db = getDatabase();
+          this.toPick = 'Please wait...'
+          //const ordersRef = ref(database, 'orders/' + this.pickDate + '/' + this.rtName)
 
-          
+          try {
+            console.log('getting data!')
+  
+            const itemsRef = ref(database, 'orders/' + this.pickDate + '/' + this.rtName)
+            const snapshot = await get(itemsRef)
+            
+            //this.items = Object.values(snapshot.val())
+            this.toPick = snapshot.val()
+            this.havePick = true
+  
+            } catch (error) {
+              console.error(error)
+            }
+
 
         },
-        incItem(idx, amt) { 
-          if ((idx[5] + amt) >= idx[3]) {
-            idx[5] = idx[3] 
-            this.order[idx[0]] = idx[3] // it was just missing this line, so anything that put it over max wasn't registering
+        sendOrder() {
+          if (!this.newDate || !this.rtName) {
+            alert('Select a date & route!')
+            return
           } else {
-            idx[5] += amt 
-            if (this.order[idx[0]] == undefined) { this.order[idx[0]] = 0 } 
-              this.order[idx[0]] = this.order[idx[0]] + amt
+          const db = getDatabase();
+          set(ref(db, 'orders/' + this.newDate + '/' + this.rtName + '/' + this.accountName), this.order).then(() => {
+            alert('saved!')
+            this.order = {}
+            this.accountName = ''
+            items.forEach(item => {
+              item['placeholder'] = 0 
+            })
+          })
+        }
+        },
+        incItem(item, amount) { 
+          if ((item['placeholder'] + amount) >= item['max']) { 
+            item['placeholder'] = item['max']
+            this.order[item['name']] = item['max']
+          } else {
+            item['placeholder'] += amount
+            if (this.order[item['name']] == undefined) { this.order[item['name']] = 0 }  
+              this.order[item['name']] = this.order[item['name']] + amount
           }
         },
-
-        decItem(idx, amt) {
-          if((idx[5] - amt) <= 0) {
-            idx[5] = 0
-            this.order[idx[0]] = 0
+        decItem(item, amount) {
+          if((item['placeholder'] - amount) <= 0) {
+            item['placeholder'] = 0
+            this.order[item['name']] = 0
           } else {
-            idx[5] -= amt           
-            this.order[idx[0]] -= amt
+            item['placeholder'] -= amount           
+            this.order[item['name']] -= amount
           }
         },
         asToggle() {

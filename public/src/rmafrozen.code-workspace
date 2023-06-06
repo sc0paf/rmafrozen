@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "../.."
+		},
+		{
+			"path": "../../../Public/rmafr/rmafr"
 		}
 	],
 	"settings": {

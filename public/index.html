@@ -12,32 +12,31 @@
 
 
 <div id="app" class="main__cont">
-    <div class="topwrap"><h1>RMA Frozen Sheet</h1></div>
+    <div class="header">
+        <h1>RMA Frozen Sheet</h1>
+    </div>
 
-        <!-- Admin Panel -->
+    <!-- Admin Panel / to be implemented later (maybe) -->
     <div class="header" v-if="admin == true">
         <h3>Add items</h3>
         <form>
-        Item: <input type="text" v-model="newItem">
-        Minimum: <input type="number" v-model="newMinimum">
-        Maximum: <input type="number" v-model="newMaximum">
-        Category: <input type="text" v-model="newCategory">
-        Avail:<input type="checkbox" v-model="newAvail">
-          <button @click.prevent="addNewItem()">Add</button>
+            Item: <input type="text" v-model="newItem">
+            Minimum: <input type="number" v-model="newMinimum">
+            Maximum: <input type="number" v-model="newMaximum">
+            Category: <input type="text" v-model="newCategory">
+            Avail:<input type="checkbox" v-model="newAvail">
+            <button @click.prevent="addNewItem()">Add</button>
         </form>
     </div>
-    <!-- end admin  / start pull -->
-    <div class="topwrap" v-if="pickLine">
-        
-    </div>
+    
 
-
-    <!-- end Pull -->
-
-    <ul class="topwrap">
+    <div class="topwrap">
+    <ul>
     <form>
+        <li>Order for: <input type="date" v-model="newDate"></li>
         <li class="frow"><label for="route">Route: </label>
             <select name="route" id="route" v-model="rtName">
+                <option value="sel">Choose</option>
                 <option value="r1">Route 1</option>
                 <option value="r2">Route 2</option>
                 <option value="r3">Route 3</option>
@@ -53,32 +52,53 @@
             </select>
         </li>
 
-        <li class="frow">
+
+        <li class="frow" v-if="driver">
             <label for="account">Account: </label>
             <input type="text" v-model="accountName">
         </li>
-        
-        <input type="radio" id="Vending" value="Vending" v-model="vendOrMart" style="float:left; margin-left: 25%;" />
-        <label for="Vending" style="float: left; ">Frozen</label>
-        <input type="radio" id="Market" value="Market" v-model="vendOrMart" />
-        <label for="Market">Coffee Products</label>
+
     </ul>
+    <template v-if="driver"><input type="radio" id="Vending" value="Vending" v-model="vendOrMart" style="float:left; margin-left: 25%;" />
+        <label for="Vending" style="float: left;">Frozen</label>
+        <input type="radio" id="Market" value="Market" v-model="vendOrMart" />
+        <label for="Market">Coffee Products</label></template>
+
+            <!-- end admin  / start pickline -->
+            <div v-if="pickLine">           
+                Pick for: <input type="date" v-model="pickDate">
+                <button @click="getOrders()">Get Pick Line</button>
+                <template v-if="havePick">
+                    <div v-for="(account, key) in toPick">
+                        <p /><b><u>{{key}}</u></b><br>
+                        <template v-for="(item, key) in account">
+                            </b>{{key}}: {{item}}</b><br>
+                        </template>
+                    </div>
+                </template>
+            </div>
+    <!-- end Pull -->
+    </div>
+
+
 
         <div>
-            <button class="uiToggle" @click="asToggle" :class="[isToggled ? 'active' : '']">ADD</button>
+            <button class="uiToggle" @click="asToggle" :class="[isToggled ? 'active' : '']" v-if="driver">ADD</button>
             
-            <button class="uiToggle" @click="asToggle" :class="[!isToggled ? 'active' : '']">REMOVE</button>
+            <button class="uiToggle" @click="asToggle" :class="[!isToggled ? 'active' : '']" v-if="driver">REMOVE</button>
         </div>
+    
 
+    <template v-if="driver">
         <div v-if="vendOrMart == 'Vending'" class="topwrap">
-           <h2>Frozen</h2>
+           <h2 style="margin: .25em 0;">Frozen</h2>
             <span v-if="dataReady">
                 <template v-for="(item, index) in items">
-                    <div class="frow" v-if="item[1]">
-                        <button @click="isToggled ? incItem(item, 1) : decItem(item, 1)">{{item[0]}} - {{index}}</button>
+                    <div class="frow" v-if="item['avail']">
+                        <button @click="isToggled ? incItem(item, 1) : decItem(item, 1)" width="60%">{{item['name']}}</button>
                         <button @click="isToggled ? incItem(item, 6) : decItem(item, 6)" style="width: 10%;">6</button>
                         <button @click="isToggled ? incItem(item, 10) : decItem(item, 10)" style="width: 10%;">10</button>
-                        <input type="number" :min="item[2]" :max="item[3]" :id="index" v-model="item[5]">
+                        <input type="number" :min="item['min']" :max="item['max']" :id="index" v-model="item['placeholder']">
                     </div>
                 </template>
             </span>
@@ -86,15 +106,18 @@
         <div v-if="vendOrMart == 'Market'" class="topwrap">
             <h1>Coffee Products</h1>
         </div>
-        <textarea placeholder="Write-ins or comments"></textarea>
-        <button style="width:100%; height: 3rem; box-shadow: 5px 5px 5px black; font-size: 24px;" @click="postOrder()"><b>SUBMIT</b></button>
+        <textarea placeholder="Write-ins or comments" v-model="order['comments']"></textarea>
+        <button style="width:100%; height: 3rem; box-shadow: 5px 5px 5px black; font-size: 24px;" @click="sendOrder()"><b>SUBMIT</b></button>
     </form>
+    </template>
+
+
 
 
 <footer id="footer">
-    <button @click="admin = !admin">Add Items</button>
+    <button>Add Items</button>
     <button>order</button>
-    <button @click="pickLine = !pickLine">pull</button>
+    <button @click="pickLine = !pickLine, driver = !driver">pull</button>
 </footer>
 </div>
 
